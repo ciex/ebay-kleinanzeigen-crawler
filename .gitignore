@@ -1,5 +1,8 @@
 *.pyc
 __pycache__
-data/index.html
-data/results.json
-all.sh
+.pytest_cache/
+data/*
+tests/data/*
+*.log
+
+.DS_Store
