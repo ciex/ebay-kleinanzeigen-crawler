@@ -12,7 +12,7 @@ from urllib.parse import urljoin
 
 
 VERSION = '1.0'
-BASE_URL = "https://www.ebay-kleinanzeigen.de/seite:{page_num}/{keywords}/{location}"
+BASE_URL = "https://www.ebay-kleinanzeigen.de/preis:{min_price}:{max_price}/seite:{page_num}/{keywords}/{location}"
 OUT_FNAME = 'results.json'
 RATE = 1  # wait n seconds between queries
 
@@ -30,13 +30,15 @@ class Crawler(object):
         self.debug = debug
         self.last_query = None
 
-    def add_query(self, keywords, location='k0', max_page=1):
+    def add_query(self, keywords, location='k0', max_page=1, min_price=None, max_price=None):
         logging.info("Adding query '{}' {}p in {}".format(
             keywords, max_page, location))
 
         existing_query = len([q for q in self.queries if \
             q.keywords == keywords and \
-            location == location]) > 0
+            location == location and \
+            min_price == min_price and \
+            max_price == max_price]) > 0
         
         if existing_query:
             logging.info("Skipped adding duplicate query")
@@ -45,7 +47,9 @@ class Crawler(object):
                 'keywords': keywords,
                 'results': [],
                 'location': location,
-                'max_page': max_page
+                'max_page': max_page,
+                'min_price': min_price,
+                'max_price': max_price
             }))
 
     @classmethod
@@ -64,7 +68,8 @@ class Crawler(object):
             results = []
             try:
                 for page_num in range(1, q.max_page + 1):
-                    results += self.run_query(q.keywords, page_num, q.location)
+                    results += self.run_query(q.keywords, page_num, \
+                        q.location, q.min_price, q.max_price)
             except Exception as e:
                 logging.error(e)
                 if self.debug:
@@ -72,12 +77,14 @@ class Crawler(object):
             self.queries[i].results = results
         logging.info("Completed in {}".format(datetime.now() - start))
 
-    def run_query(self, keywords, page_num, location):
+    def run_query(self, keywords, page_num, location, min_price, max_price):
         keywords_formatted = '-'.join(keywords.lower().split(' '))
         url = BASE_URL.format(
             keywords=keywords_formatted,
             page_num=page_num,
-            location=location
+            location=location,
+            min_price=min_price or '',
+            max_price=max_price or ''
         )
 
         if self.last_query:
