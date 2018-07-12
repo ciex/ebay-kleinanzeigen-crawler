@@ -16,8 +16,6 @@ BASE_URL = "https://www.ebay-kleinanzeigen.de/seite:{page_num}/{keywords}/{locat
 OUT_FNAME = 'results.json'
 RATE = 1  # wait n seconds between queries
 
-# Location Berlin: k0l3331
-
 logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(name).24s %(levelname)-8s %(message)s',
     datefmt='%m-%d %H:%M',
@@ -124,7 +122,11 @@ class Crawler(object):
             json.dump(data, f, ensure_ascii=False, indent=2)
 
 if __name__ == '__main__':
-    crawler = Crawler.from_json()
+    # Load previous crawler results from json file:
+    # crawler = Crawler.from_json()
+    crawler = Crawler()
+    # Location string for Berlin = k0l3331
+    crawler.add_query('xbox', location='k0l3331', max_page=3)
     crawler.run_queries()
     crawler.to_json()
     crawler.to_html(-1)
