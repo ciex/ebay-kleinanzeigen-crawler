@@ -1,3 +1,6 @@
 attrdict==2.0.0
 MechanicalSoup==0.6.0
 Jinja2==2.8
+pytest>=3.6.3
+python-telegram-bot>=10.1.0
+requests>=2.19.1
