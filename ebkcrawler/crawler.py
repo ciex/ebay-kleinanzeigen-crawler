@@ -42,10 +42,13 @@ class Bot(object):
 
     def add_query(self, bot, update, args, chat_data):
         chat_id = update.message.chat_id
-        keywords = " ".join(args)
-        logging.info("Account #{} requested new query '{}'".format(chat_id, keywords))
-        self.crawler.add_query(keywords, location='k0l3331', subscriber=chat_id)
-        update.message.reply_text('Suchanfrage gestartet')
+        if len(args) == 0:
+            update.message.reply_text('Ja ok, und was soll ich suchen? Musst schon die Suchanfrage noch nach /suche schreiben!')
+        else:
+            keywords = " ".join(args)
+            logging.info("Account #{} requested new query '{}'".format(chat_id, keywords))
+            self.crawler.add_query(keywords, location='k0l3331', subscriber=chat_id)
+            update.message.reply_text('Suchanfrage gestartet')
 
     def from_json(self):
         try:
@@ -156,12 +159,12 @@ class Crawler(object):
             raise ValueError(
                 "Query keywords must be a string. Is '{}'".format(keywords))
 
-        existing_query = len([q for q in self.queries if \
-            q.keywords == keywords and \
-            q.location == location and \
-            q.min_price == min_price and \
-            q.max_price == max_price] and \
-            q.subscriber == subscriber) > 0
+        existing_query = len([q for q in self.queries if 
+            q.keywords == keywords and 
+            q.location == location and 
+            q.min_price == min_price and 
+            q.max_price == max_price and 
+            q.subscriber == subscriber]) > 0
         
         if existing_query:
             logging.info("Skipped adding duplicate query")

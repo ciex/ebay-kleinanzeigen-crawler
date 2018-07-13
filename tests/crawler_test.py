@@ -12,12 +12,12 @@ def test_crawler(crawler):
     assert crawler.browser != None
 
 def test_add_query(crawler):
-    crawler.add_query('xbox', max_page=2, max_price=90)
+    crawler.add_query('xbox', max_page=2, max_price=90, subscriber=1)
     assert crawler.queries[-1]['keywords'] == 'xbox'
 
 def test_duplicate_query(crawler):
     len_before = len(crawler.queries)
-    crawler.add_query('xbox', max_page=2, max_price=90)
+    crawler.add_query('xbox', max_page=2, max_price=90, subscriber=1)
     assert len(crawler.queries) == len_before
 
 def test_run_queries(crawler):
