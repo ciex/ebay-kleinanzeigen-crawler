@@ -17,7 +17,7 @@ def test_add_query(crawler):
 
 def test_duplicate_query(crawler):
     len_before = len(crawler.queries)
-    crawler.add_query('xbox', max_page=2)
+    crawler.add_query('xbox', max_page=2, max_price=90)
     assert len(crawler.queries) == len_before
 
 def test_run_queries(crawler):
