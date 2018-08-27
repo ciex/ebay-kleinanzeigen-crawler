@@ -242,6 +242,9 @@ class Crawler(object):
         logging.info("Querying for {} in {} (page {})".format(
             query.keywords, query.location, page_num))
         page = self.browser.get(url)
+        
+        with open(os.path.join(self.target_dir, keywords_formatted + str(self.last_query).replace(':', '-') + '.html'), 'w+') as f:
+            f.write(page.text)
 
         results = []
         known_links = set([r.link for r in query.results])
