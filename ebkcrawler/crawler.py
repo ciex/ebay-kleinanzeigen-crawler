@@ -8,6 +8,7 @@ import os
 from attrdict import AttrDict
 from collections import defaultdict
 from datetime import datetime, timedelta
+from random import shuffle, randint
 from time import sleep
 from urllib.parse import urljoin
 from telegram import ParseMode
@@ -18,7 +19,7 @@ VERSION = '1.0'
 BASE_URL = "https://www.ebay-kleinanzeigen.de/preis:{min_price}:{max_price}/seite:{page_num}/{keywords}/{location}"
 OUT_FNAME = 'results.json'
 RATE = 1  # wait n seconds between individual requests to ebay
-UPDATE_INTERVAL = timedelta(minutes=5)  # wait n seconds between crawl runs
+UPDATE_INTERVAL = timedelta(minutes=30)  # wait n seconds between crawl runs
 
 logging.basicConfig(level=logging.DEBUG,
     format='%(asctime)s %(name).24s %(levelname)-8s %(message)s',
@@ -98,6 +99,7 @@ class Bot(object):
             sleep(0.3)
         
     def check_results(self, bot, job):
+        sleep(randint(1, 30))
         for query in crawler.run_queries():
             results = query.recently_added
             logging.info("Crawler found {} new results".format(len(results)))
@@ -205,7 +207,10 @@ class Crawler(object):
     def run_queries(self):
         logging.info("Running {} queries".format(len(self.queries)))
         start = datetime.now()
-        for i, q in enumerate(self.queries):
+        queries_in_order = [x for x in self.queries]
+        shuffle(queries_in_order)
+        for i, q in enumerate(queries_in_order):
+            sleep(randint(1, 30))
             results = []
             try:
                 for page_num in range(1, q.max_page + 1):
@@ -241,7 +246,7 @@ class Crawler(object):
 
         logging.info("Querying for {} in {} (page {})".format(
             query.keywords, query.location, page_num))
-        page = self.browser.get(url)
+        page = self.browser.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36'})
         
         with open(os.path.join(self.target_dir, keywords_formatted + str(self.last_query).replace(':', '-') + '.html'), 'w+') as f:
             f.write(page.text)
